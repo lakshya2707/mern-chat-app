@@ -7,7 +7,7 @@ const { Server } = require("socket.io");
 const authRoutes = require("./routes/authRoutes");
 const Message = require("./models/Message");
 
-dotenv.config({ path: './mern-chat-app/.env' }); // Load environment variables from .env file
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const httpServer = createServer(app);

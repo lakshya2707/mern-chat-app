@@ -19,7 +19,7 @@ const Chat = () => {
     }
 
     // Create socket connection
-    const socket = io("http://localhost:5000");
+    const socket = io("https://mern-chat-app-b7aq.onrender.com/");
 
     // Listen for incoming messages
     socket.on("receive_message", (newMessage) => {

@@ -7,64 +7,60 @@ const { Server } = require("socket.io");
 const authRoutes = require("./routes/authRoutes");
 const Message = require("./models/Message");
 
-dotenv.config(); // Load environment variables from .env file
+dotenv.config(); 
 
 const app = express();
 const httpServer = createServer(app);
 
-// Set up Socket.io server with CORS options
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Allow any origin (use a specific origin in production)
+    origin: "*", 
     methods: ["GET", "POST"],
   },
 });
 
-// Use middleware
-app.use(cors()); // CORS middleware for Express API
-app.use(express.json()); // Middleware to parse JSON requests
+app.use(cors()); 
+app.use(express.json()); 
 
-// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Use the auth routes for user authentication
 app.use(authRoutes);
 
-// Basic route for server status
 app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
-// In-memory object to store online users
 const onlineUsers = {};
 
-// Socket.io event handling
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  // Handle user joining the chat
   socket.on("join", (userId) => {
-    // Store the user as online
-    onlineUsers[socket.id] = userId; // Map socket id to user id
-
-    console.log(`${userId} joined the chat`);
+    onlineUsers[socket.id] = userId[1];
+    console.log(`${userId[1]} joined the chat`);
     // Emit the updated list of online users
     io.emit("online_users", getOnlineUsers());
   });
 
   // Handle incoming messages from the client
   socket.on("send_message", async (data) => {
-    const { senderId, content } = data;
+    const { senderId,senderName, content } = data;
 
     try {
-      // Save the message in the database
+      // Save the message in the database (including senderId for tracking)
       const message = await Message.create({ sender: senderId, content });
-
+  
+      // Include senderName in the message object
+      const messageWithSender = {
+        ...message.toJSON(), // Convert Sequelize model to plain object
+        senderName,
+      };
+  
       // Emit the message to all connected clients
-      io.emit("receive_message", message);
+      io.emit("receive_message", messageWithSender);
     } catch (error) {
       console.error("Error saving message:", error);
     }
@@ -80,7 +76,6 @@ io.on("connection", (socket) => {
     io.emit("online_users", getOnlineUsers());
   });
 });
-
 // Function to get the list of online users (extract from the socket ids)
 const getOnlineUsers = () => {
   // Extract user IDs from the onlineUsers object and return them as a list

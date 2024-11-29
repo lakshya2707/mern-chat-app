@@ -21,7 +21,7 @@ const Chat = () => {
       setMessages(storedMessages); // Set messages from localStorage
     }
 
-    const socket = io("http://localhost:5000/");
+    const socket = io("https://mern-chat-app-b7aq.onrender.com/");
 
     // Listen for incoming messages
     socket.on("receive_message", (newMessage) => {

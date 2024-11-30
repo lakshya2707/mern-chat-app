@@ -1,4 +1,4 @@
-hi there-
+hi there- please reload your page because backend takes 50-60 seconds to restart.
 # **⚠️ If you are a recruiter, please view my Vercel link [here](https://mern-chat-app-nu-nine.vercel.app/)! ⚠️**
 Setting Up Locally
 1. Clone the Repository:

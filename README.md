@@ -1,5 +1,5 @@
 hi there-
-I am Lakshya Prakash. I am a mechanical engineering student here at IIT Bombay. 
+I am Lakshya Prakash. I am a third year mechanical engineering student at IIT Bombay. 
 # **⚠️please reload your page because backend takes 50-60 seconds to restart.
 If you are a recruiter, please view my Vercel link [here](https://mern-chat-app-nu-nine.vercel.app/)! ⚠️**
 Setting Up Locally

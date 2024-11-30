@@ -5,7 +5,7 @@ If you are a recruiter, please view my Vercel link [here](https://mern-chat-app-
 Setting Up Locally
 1. Clone the Repository:
 Clone the repository to your local machine.
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/lakshya2707/mern-chat-app/)
 cd mern-chat-app
 
 2. Install Backend Dependencies:

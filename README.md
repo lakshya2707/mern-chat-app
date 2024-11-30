@@ -26,7 +26,7 @@ npm install
 
 6. Start the Frontend:
 In the frontend folder, run:
-npm start
+node script.js
 
 Your frontend should now be running at http://localhost:3000/ and your backend at http://localhost:5000/. Well depending upon whether the code contains address of localhost or render in frontend. Please change this address for hosting locally in frontend chat.js and authService.js.
 Conclusion

@@ -17,7 +17,7 @@ MONGO_URI=mongodb://<your-mongodb-uri>
 PLEASE DO NOT USE MINE :). I have uploaded it though
 4. Start the Backend:
 In the backend folder, run:
-npm start
+node script.js
 
 5. Install Frontend Dependencies:
 Navigate to the frontend directory and install dependencies.
@@ -26,7 +26,7 @@ npm install
 
 6. Start the Frontend:
 In the frontend folder, run:
-node script.js
+npm start
 
 Your frontend should now be running at http://localhost:3000/ and your backend at http://localhost:5000/. Well depending upon whether the code contains address of localhost or render in frontend. Please change this address for hosting locally in frontend chat.js and authService.js.
 Conclusion

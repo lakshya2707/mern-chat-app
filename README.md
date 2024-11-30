@@ -1,5 +1,7 @@
-hi there- please reload your page because backend takes 50-60 seconds to restart.
-# **⚠️ If you are a recruiter, please view my Vercel link [here](https://mern-chat-app-nu-nine.vercel.app/)! ⚠️**
+hi there-
+I am Lakshya Prakash. I am a mechanical engineering student here at IIT Bombay. 
+# **⚠️please reload your page because backend takes 50-60 seconds to restart.
+If you are a recruiter, please view my Vercel link [here](https://mern-chat-app-nu-nine.vercel.app/)! ⚠️**
 Setting Up Locally
 1. Clone the Repository:
 Clone the repository to your local machine.
@@ -17,7 +19,8 @@ MONGO_URI=mongodb://<your-mongodb-uri>
 PLEASE DO NOT USE MINE :). I have uploaded it though
 4. Start the Backend:
 In the backend folder, run:
-node script.js
+cd ..
+node .\backend\server.js (because .env file is in main mern-chat-app folder).
 
 5. Install Frontend Dependencies:
 Navigate to the frontend directory and install dependencies.

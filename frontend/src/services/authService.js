@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://mern-chat-app-1-8vqd.onrender.com";
+const API_URL = "https://mern-chat-app-1-8vqd.onrender.com/";
 
 // Register new user
 const register = async (username, email, password) => {

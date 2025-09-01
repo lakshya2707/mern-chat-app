@@ -1,90 +1,125 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const authRoutes = require("./routes/authRoutes");
-const Message = require("./models/Message");
+import React, { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+import authService from "../services/authService";
+import Message from "./message";
 
-dotenv.config();
+const Chat = () => {
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [socket, setSocket] = useState(null);
 
-const app = express();
-const httpServer = createServer(app);
-
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
-
-app.use(cors());
-app.use(express.json());
-
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
-app.use(authRoutes);
-
-app.get("/", (req, res) => {
-  res.send("Server is running!");
-});
-
-const onlineUsers = {};
-
-// Socket.io connection
-io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
-
-  // Handle join
-  socket.on("join", (user) => {
-    // user = { id, username }
-    onlineUsers[socket.id] = user.username;
-    console.log(`${user.username} joined the chat`);
-
-    io.emit("online_users", getOnlineUsers());
-  });
-
-  // Handle sending messages
-  socket.on("send_message", async (data) => {
-    const { senderId, senderName, content } = data;
-
-    try {
-      const message = await Message.create({ sender: senderId, content });
-
-      const messageWithSender = {
-        ...message.toObject(), // Mongoose safe conversion
-        senderName,
-      };
-
-      io.emit("receive_message", messageWithSender);
-    } catch (error) {
-      console.error("Error saving message:", error);
+  useEffect(() => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
     }
-  });
 
-  // Handle disconnect
-  socket.on("disconnect", () => {
-    const username = onlineUsers[socket.id];
-    delete onlineUsers[socket.id];
+    const storedMessages = JSON.parse(localStorage.getItem("messages"));
+    if (storedMessages) {
+      setMessages(storedMessages);
+    }
 
-    console.log(`User ${username} disconnected`);
+    const socketInstance = io("https://mern-chat-app-b7aq.onrender.com/");
 
-    io.emit("online_users", getOnlineUsers());
-  });
-});
+    // Receive messages
+    socketInstance.on("receive_message", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
 
-const getOnlineUsers = () => {
-  return Object.values(onlineUsers); // usernames list
+    // Online users
+    socketInstance.on("online_users", (users) => {
+      setOnlineUsers(users);
+    });
+
+    // Join with full object
+    socketInstance.emit("join", { id: user.id, username: user.username });
+
+    setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("messages", JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  const handleSendMessage = () => {
+    if (message.trim() && socket) {
+      const data = {
+        senderId: user.id,
+        senderName: user.username,
+        content: message,
+      };
+      socket.emit("send_message", data);
+      setMessage("");
+    }
+  };
+
+  const handleLogout = () => {
+    if (socket) {
+      socket.disconnect();
+    }
+    authService.logout();
+    window.location.href = "/login";
+  };
+
+  return (
+    <div className="h-screen flex flex-col bg-gray-100">
+      <div className="bg-blue-500 text-white p-4 flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Welcome, {user.username}!</h2>
+        <button
+          className="bg-red-500 p-2 rounded hover:bg-red-600"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </div>
+
+      <div className="flex-grow p-4">
+        <h3 className="text-xl font-semibold mb-2">Online Users</h3>
+        <ul className="list-disc pl-6">
+          {onlineUsers.map((onlineUser, idx) => (
+            <li key={idx} className="mb-1 text-lg">
+              {onlineUser}
+            </li>
+          ))}
+        </ul>
+
+        <div className="bg-white p-4 rounded-lg shadow-lg mt-4 h-72 overflow-auto">
+          <h3 className="text-xl font-semibold mb-2">Chat Room</h3>
+          {messages.map((msg, index) => (
+            <Message
+              key={index}
+              sender={msg.senderName}
+              content={msg.content}
+            />
+          ))}
+        </div>
+
+        <div className="mt-4 flex">
+          <input
+            type="text"
+            className="w-full p-2 border border-gray-300 rounded-l-lg"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type a message"
+          />
+          <button
+            onClick={handleSendMessage}
+            className="bg-blue-500 p-2 text-white rounded-r-lg hover:bg-blue-600"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+export default Chat;

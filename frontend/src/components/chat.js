@@ -21,7 +21,7 @@ const Chat = () => {
       setMessages(storedMessages);
     }
 
-    const socketInstance = io("https://mern-chat-app-b7aq.onrender.com/");
+    const socketInstance = io("https://mern-chat-app-1-8vqd.onrender.com");
 
     // Receive messages
     socketInstance.on("receive_message", (newMessage) => {
